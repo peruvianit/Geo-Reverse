@@ -15,24 +15,23 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.log4j.Logger;
 
+import it.peruvianit.bean.GeoConfig;
 import it.peruvianit.exceptions.GeoException;
 import it.peruvianit.repository.MapCodeAddress;
 import it.peruvianit.utils.FileUtil;
 import it.peruvianit.utils.GeoPropertiesUtil;
+import static it.peruvianit.constant.GeoConstant.*;
 
 public class Run {
-	public final static String  GEO_FILE_PROPERTIES = "geo.properties";
-	public final static String  GEO_PATH_DIRECTORY_IN = "geo.path.directory.in";
-	public final static String  GEO_PATH_DIRECTORY_PROCESS = "geo.path.directory.process";
-	
 	public final static Logger logger = Logger.getLogger(Run.class);
 	
 	public static void main(String[] args) throws GeoException, UnsupportedEncodingException {
 		logger.info("Start program.");
 		
-		GeoPropertiesUtil geoPropertiesUtil = loadGeoPropertiesUtil();
-		String pathDirectoryIn = geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_IN);
-		String pathDirectoryProcess = geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_PROCESS);
+		GeoConfig geoConfig = loadGeoPropertiesUtil();
+		
+		String pathDirectoryIn = geoConfig.getPathDirectoryIn();
+		String pathDirectoryProcess = geoConfig.getPathDirectoryProcess();
 		
 		FileUtil.checkDirecctory(pathDirectoryIn,pathDirectoryProcess);
 		
@@ -49,7 +48,7 @@ public class Run {
 			int i;
 			for (i = 0; i < files.length; i++) {
 				String fileName = files[i].getPath();
-				Thread t = new Thread(new Interpreter(fileName,pathDirectoryProcess));
+				Thread t = new Thread(new Interpreter(fileName,geoConfig));
 		        t.start();
 				logger.debug("Thread [" + (i + 1)  + "] : [" + fileName + "]");
 	        }
@@ -63,7 +62,9 @@ public class Run {
 	 * @return GeoPropertiesUtil
 	 * @throws GeoException 
 	 */	
-	public static GeoPropertiesUtil loadGeoPropertiesUtil() throws GeoException{
+	public static GeoConfig loadGeoPropertiesUtil() throws GeoException{
+		GeoConfig geoConfig = new GeoConfig();
+		
 		String pathName = FileUtil.getPathClass(FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 		String pathNameConf = pathName + "/conf";
 		
@@ -72,6 +73,11 @@ public class Run {
 		GeoPropertiesUtil geoPropertiesUtil = new GeoPropertiesUtil(pathNameConf, GEO_FILE_PROPERTIES);
 		geoPropertiesUtil.init();
 		
-		return geoPropertiesUtil;
+		geoConfig.setCsvColumnCode(geoPropertiesUtil.getProperty(GEO_POSTITION_CSV_COLUMN_CODE));
+		geoConfig.setCsvColumnAddress(geoPropertiesUtil.getProperty(GEO_POSTITION_CSV_COLUMN_ADDRESS));
+		geoConfig.setPathDirectoryIn(geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_IN));
+		geoConfig.setPathDirectoryProcess(geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_PROCESS));
+		
+		return geoConfig;
 	}
 }

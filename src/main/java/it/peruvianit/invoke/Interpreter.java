@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
+import it.peruvianit.bean.GeoConfig;
 import it.peruvianit.exceptions.GeoException;
 import it.peruvianit.repository.MapCodeAddress;
 import it.peruvianit.utils.OpenStreetMapUtils;
@@ -30,13 +32,17 @@ import it.peruvianit.utils.OpenStreetMapUtils;
 public class Interpreter implements Runnable {
 	public final static Logger logger = Logger.getLogger(Interpreter.class);
 	
+	private final Integer csvColumnCode;
+	private final Integer csvColumnAddress;
 	private final String pathFileName;
 	private final String pathDirectoryProcess;
 	
-    public Interpreter(String pathFileName, String pathDirectoryProcess) {
+    public Interpreter(String pathFileName, GeoConfig geoConfig) {
 		super();
 		this.pathFileName = pathFileName;
-		this.pathDirectoryProcess = pathDirectoryProcess;
+		this.csvColumnCode = Integer.parseInt(geoConfig.getCsvColumnCode());
+		this.csvColumnAddress = Integer.parseInt(geoConfig.getCsvColumnAddress());
+		this.pathDirectoryProcess = geoConfig.getPathDirectoryProcess();
 	}
 
 	@SuppressWarnings("resource")
@@ -51,19 +57,25 @@ public class Interpreter implements Runnable {
 			fr = new FileReader(this.pathFileName);
 			br = new BufferedReader(fr);
 
+			String fileName = FilenameUtils.getName(this.pathFileName);
+			if (fileName.lastIndexOf(".")>=0){
+				fileName = fileName.substring(0, fileName.lastIndexOf("."));
+			}
+			
 			String UUID_code = UUID.randomUUID().toString();
 			
-			bw_OK = new BufferedWriter(new FileWriter(this.pathDirectoryProcess + "\\" + UUID_code + ".OK"));
-			bw_KO = new BufferedWriter(new FileWriter(this.pathDirectoryProcess + "\\" + UUID_code + ".KO"));
+			String fileWorking = this.pathDirectoryProcess + "\\" + fileName + "-" + UUID_code;
+			bw_OK = new BufferedWriter(new FileWriter(fileWorking + ".OK"));
+			bw_KO = new BufferedWriter(new FileWriter(fileWorking + ".KO"));
 			
 			String sCurrentLine;
 			int riga = 1;
 			while ((sCurrentLine = br.readLine()) != null) {
 				String addressArray[] = sCurrentLine.split("\\|\\|");
-				if (addressArray.length == 2){
+				if (addressArray.length >= 2){
 					Map<String, Double> coords = null;
-					String idAddress = addressArray[0];
-	        		String address = addressArray[1];
+					String idAddress = addressArray[csvColumnCode-1];
+	        		String address = addressArray[csvColumnAddress-1];
 	        		
 	        		if(!MapCodeAddress.getInstance().findCodeAddress(idAddress)){
 		                try {
@@ -74,7 +86,7 @@ public class Interpreter implements Runnable {
 		                
 		                String status;
 		                if(coords != null && coords.size()>0){
-		                	bw_OK.write(idAddress + "||" + address + "||" + coords.get("lat") + "||" + coords.get("lon"));
+		                	bw_OK.write(sCurrentLine + "||" + coords.get("lat") + "||" + coords.get("lon"));
 		                	bw_OK.newLine();
 		                	bw_OK.flush();
 		                	status = "OK";
