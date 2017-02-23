@@ -15,10 +15,11 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.log4j.Logger;
 
-import it.peruvianit.bean.GeoConfig;
+import it.peruvianit.bean.GeoConfigBean;
+import it.peruvianit.bean.LoadInfo;
 import it.peruvianit.exceptions.GeoException;
 import it.peruvianit.repository.MapCodeAddress;
-import it.peruvianit.utils.FileUtil;
+import it.peruvianit.utils.FileUtils;
 import it.peruvianit.utils.GeoPropertiesUtil;
 import static it.peruvianit.constant.GeoConstant.*;
 
@@ -28,12 +29,12 @@ public class Run {
 	public static void main(String[] args) throws GeoException, UnsupportedEncodingException {
 		logger.info("Start program.");
 		
-		GeoConfig geoConfig = loadGeoPropertiesUtil();
+		GeoConfigBean geoConfig = loadGeoPropertiesUtil();
 		
 		String pathDirectoryIn = geoConfig.getPathDirectoryIn();
 		String pathDirectoryProcess = geoConfig.getPathDirectoryProcess();
 		
-		FileUtil.checkDirecctory(pathDirectoryIn,pathDirectoryProcess);
+		FileUtils.checkDirecctory(pathDirectoryIn,pathDirectoryProcess);
 		
 		File mainFolder = new File(pathDirectoryIn);
 		File files[];
@@ -41,14 +42,22 @@ public class Run {
 		
 		if (files != null){
 			logger.debug("Caricando mapa dei inidirizzi processati in pasato");
-			MapCodeAddress.getInstance().loadMap(pathDirectoryProcess);
-			logger.debug("Total inidirizzi caricati : " + MapCodeAddress.getInstance().size());
+			LoadInfo loadInfo = MapCodeAddress.getInstance().loadMap(pathDirectoryProcess);
+			
+			Integer rowTotal = MapCodeAddress.getInstance().countRows(pathDirectoryIn);			
+			Integer rowLastWorking = MapCodeAddress.getInstance().size();
+			
+			loadInfo.setRowLastWorking(rowLastWorking);
+			loadInfo.setRowTotal(rowTotal);
+			
+			logger.debug("Total inidirizzi da caricare : " + rowTotal);
+			logger.debug("Total inidirizzi caricati : " + rowLastWorking);
 			
 			logger.info("[" + files.length + "] Files trovati da processare");
 			int i;
 			for (i = 0; i < files.length; i++) {
 				String fileName = files[i].getPath();
-				Thread t = new Thread(new Interpreter(fileName,geoConfig));
+				Thread t = new Thread(new Interpreter(fileName, geoConfig, loadInfo));
 		        t.start();
 				logger.debug("Thread [" + (i + 1)  + "] : [" + fileName + "]");
 	        }
@@ -62,13 +71,13 @@ public class Run {
 	 * @return GeoPropertiesUtil
 	 * @throws GeoException 
 	 */	
-	public static GeoConfig loadGeoPropertiesUtil() throws GeoException{
-		GeoConfig geoConfig = new GeoConfig();
+	public static GeoConfigBean loadGeoPropertiesUtil() throws GeoException{
+		GeoConfigBean geoConfig = new GeoConfigBean();
 		
-		String pathName = FileUtil.getPathClass(FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		String pathName = FileUtils.getPathClass(FileUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 		String pathNameConf = pathName + "/conf";
 		
-		FileUtil.checkDirecctory(pathNameConf);
+		FileUtils.checkDirecctory(pathNameConf);
 		
 		GeoPropertiesUtil geoPropertiesUtil = new GeoPropertiesUtil(pathNameConf, GEO_FILE_PROPERTIES);
 		geoPropertiesUtil.init();
@@ -77,6 +86,7 @@ public class Run {
 		geoConfig.setCsvColumnAddress(geoPropertiesUtil.getProperty(GEO_POSTITION_CSV_COLUMN_ADDRESS));
 		geoConfig.setPathDirectoryIn(geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_IN));
 		geoConfig.setPathDirectoryProcess(geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_PROCESS));
+		geoConfig.setPathDirectoryMetrics(geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_METRICS));
 		
 		return geoConfig;
 	}

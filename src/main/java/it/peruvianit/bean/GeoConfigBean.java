@@ -1,10 +1,11 @@
 package it.peruvianit.bean;
 
-public class GeoConfig {
+public class GeoConfigBean {
 	String csvColumnCode;
 	String csvColumnAddress;
 	String pathDirectoryIn;
 	String pathDirectoryProcess;
+	String pathDirectoryMetrics;
 	
 	public String getCsvColumnCode() {
 		return csvColumnCode;
@@ -29,5 +30,11 @@ public class GeoConfig {
 	}
 	public void setPathDirectoryProcess(String pathDirectoryProcess) {
 		this.pathDirectoryProcess = pathDirectoryProcess;
+	}
+	public String getPathDirectoryMetrics() {
+		return pathDirectoryMetrics;
+	}
+	public void setPathDirectoryMetrics(String pathDirectoryMetrics) {
+		this.pathDirectoryMetrics = pathDirectoryMetrics;
 	}
 }

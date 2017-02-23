@@ -14,13 +14,13 @@ import java.net.URLDecoder;
 
 import it.peruvianit.exceptions.GeoException;
 
-public class FileUtil {
+public class FileUtils {
 	public static String getPathClass(String pathName) throws GeoException{
 		try {
 			pathName = URLDecoder.decode(pathName,"utf-8"); // convert the path format from HTML to UTF
 			pathName = pathName.substring(1,pathName.lastIndexOf("/") );
 			
-			FileUtil.checkDirecctory(pathName);
+			FileUtils.checkDirecctory(pathName);
 			
 		} catch (UnsupportedEncodingException uEx) {
 			throw new GeoException(uEx);
