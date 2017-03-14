@@ -1,6 +1,6 @@
 package it.peruvianit.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.util.Map;
 

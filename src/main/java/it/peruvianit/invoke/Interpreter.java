@@ -33,6 +33,7 @@ import it.peruvianit.repository.MapCodeAddress;
 import it.peruvianit.utils.DateUtils;
 import it.peruvianit.utils.OpenStreetMapUtils;
 import it.peruvianit.utils.SerializableUtils;
+import it.peruvianit.utils.StringUtils;
 
 public class Interpreter implements Runnable {
 	public final static Logger logger = Logger.getLogger(Interpreter.class);
@@ -84,7 +85,7 @@ public class Interpreter implements Runnable {
 			
 			processBean.setNameProcess(fileName + "-" + UUID_code);
 			
-			String fileWorking = this.pathDirectoryProcess + "\\" + fileName + "-" + UUID_code;
+			String fileWorking = StringUtils.createStringBuilder(this.pathDirectoryProcess, "\\", fileName, "-", UUID_code.toString()).toString();
 			bw_OK = new BufferedWriter(new FileWriter(fileWorking + ".OK"));
 			bw_KO = new BufferedWriter(new FileWriter(fileWorking + ".KO"));
 			
@@ -106,23 +107,23 @@ public class Interpreter implements Runnable {
 		                
 		                String status;
 		                if(coords != null && coords.size()>0){
-		                	bw_OK.write(sCurrentLine + "||" + coords.get("lat") + "||" + coords.get("lon"));
+		                	bw_OK.write(StringUtils.createStringBuilder(sCurrentLine , "||" , coords.get("lat").toString() , "||" , coords.get("lon").toString()).toString());
 		                	bw_OK.newLine();
 		                	bw_OK.flush();
 		                	status = "OK";
 		                	rowSuccess++;
 		                }else{
-		                	bw_KO.write(idAddress + "||" + address);
+		                	bw_KO.write(StringUtils.createStringBuilder(idAddress, "||", address).toString());
 		                	bw_KO.newLine();
 		                	bw_KO.flush();
 		                	status = "KO";
 		                	rowFails++;
-		                	logger.warn(idAddress + "||" + address);
+		                	logger.warn(StringUtils.createStringBuilder(idAddress, "||", address).toString());
 		                }
-		                logger.debug("Riga elaborata [" + idAddress + "][" + status + "]: " + riga++);
+		                logger.debug(StringUtils.createStringBuilder("Riga elaborata [", idAddress, "][", status, "]: ", String.valueOf(riga++)).toString());
 	        		}
 				}else{
-					logger.warn("Riga Corrotta : " + sCurrentLine);
+					logger.warn(StringUtils.createStringBuilder("Riga Corrotta : ", sCurrentLine).toString());
 				}
 			}
 		} catch (IOException e) {

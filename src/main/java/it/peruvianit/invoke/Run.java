@@ -29,39 +29,43 @@ public class Run {
 	public static void main(String[] args) throws GeoException, UnsupportedEncodingException {
 		logger.info("Start program.");
 		
-		GeoConfigBean geoConfig = loadGeoPropertiesUtil();
-		
-		String pathDirectoryIn = geoConfig.getPathDirectoryIn();
-		String pathDirectoryProcess = geoConfig.getPathDirectoryProcess();
-		
-		FileUtils.checkDirecctory(pathDirectoryIn,pathDirectoryProcess);
-		
-		File mainFolder = new File(pathDirectoryIn);
-		File files[];
-		files = mainFolder.listFiles();
-		
-		if (files != null){
-			logger.debug("Caricando mapa dei inidirizzi processati in pasato");
-			LoadInfo loadInfo = MapCodeAddress.getInstance().loadMap(pathDirectoryProcess);
+		try{
+			GeoConfigBean geoConfig = loadGeoPropertiesUtil();
 			
-			Integer rowTotal = MapCodeAddress.getInstance().countRows(pathDirectoryIn);			
-			Integer rowLastWorking = MapCodeAddress.getInstance().size();
+			String pathDirectoryIn = geoConfig.getPathDirectoryIn();
+			String pathDirectoryProcess = geoConfig.getPathDirectoryProcess();
 			
-			loadInfo.setRowLastWorking(rowLastWorking);
-			loadInfo.setRowTotal(rowTotal);
+			FileUtils.checkDirecctory(pathDirectoryIn,pathDirectoryProcess);
 			
-			logger.debug("Total inidirizzi da caricare : " + rowTotal);
-			logger.debug("Total inidirizzi caricati : " + rowLastWorking);
+			File mainFolder = new File(pathDirectoryIn);
+			File files[];
+			files = mainFolder.listFiles();
 			
-			logger.info("[" + files.length + "] Files trovati da processare");
-			int i;
-			for (i = 0; i < files.length; i++) {
-				String fileName = files[i].getPath();
-				Thread t = new Thread(new Interpreter(fileName, geoConfig, loadInfo));
-		        t.start();
-				logger.debug("Thread [" + (i + 1)  + "] : [" + fileName + "]");
-	        }
-			logger.info("Numero di Threads caricati : " + i);
+			if (files != null){
+				logger.debug("Caricando mapa dei inidirizzi processati in pasato");
+				LoadInfo loadInfo = MapCodeAddress.getInstance().loadMap(pathDirectoryProcess);
+				
+				Integer rowTotal = MapCodeAddress.getInstance().countRows(pathDirectoryIn);			
+				Integer rowLastWorking = MapCodeAddress.getInstance().size();
+				
+				loadInfo.setRowLastWorking(rowLastWorking);
+				loadInfo.setRowTotal(rowTotal);
+				
+				logger.debug("Total inidirizzi da caricare : " + rowTotal);
+				logger.debug("Total inidirizzi caricati : " + rowLastWorking);
+				
+				logger.info("[" + files.length + "] Files trovati da processare");
+				int i;
+				for (i = 0; i < files.length; i++) {
+					String fileName = files[i].getPath();
+					Thread t = new Thread(new Interpreter(fileName, geoConfig, loadInfo));
+			        t.start();
+					logger.debug("Thread [" + (i + 1)  + "] : [" + fileName + "]");
+		        }
+				logger.info("Numero di Threads caricati : " + i);
+			}
+		}catch (Exception ex) {
+			logger.error("Errore applicativo", ex);
 		}
 	}
 	

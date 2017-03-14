@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ import org.json.simple.parser.JSONParser;
 
 import it.peruvianit.exceptions.GeoException;
 
-public class OpenStreetMapUtils {
+public class OpenStreetMapUtils{
 
     public final static Logger logger = Logger.getLogger(OpenStreetMapUtils.class);
 
@@ -92,7 +93,7 @@ public class OpenStreetMapUtils {
         query = new StringBuffer();
         res = new HashMap<String, Double>();
 
-        query.append(" https://maps.googleapis.com/maps/api/geocode/json?address=");
+        query.append("https://maps.googleapis.com/maps/api/geocode/json?address=");
        
         if (split.length == 0) {
             return null;
@@ -108,8 +109,12 @@ public class OpenStreetMapUtils {
 
         try {
             queryResult = getRequest(query.toString());
-        } catch (Exception e) {
+        } catch (UnknownHostException uhEx) {
+			logger.error("Problemi con la conessione al server: " + uhEx.getMessage());
+			throw new GeoException(uhEx);
+        } catch (Exception ex) {
             logger.error("Errore quando si cerca di ottenere i dati con la seguente Query: " + query);
+            throw new GeoException(ex);
         }
 
         if (queryResult == null) {
@@ -136,8 +141,7 @@ public class OpenStreetMapUtils {
         		}catch (GeoException gEx) {
         			throw gEx;
         		}
-        		catch (Exception e) {	
-        			// L'indirizzo non existe quando viene richiesto.
+        		catch (Exception ex) {	
         			logger.warn("Controllare : " + query);
 				}
         }
