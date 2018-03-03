@@ -6,6 +6,7 @@ public class GeoConfigBean {
 	String pathDirectoryIn;
 	String pathDirectoryProcess;
 	String pathDirectoryMetrics;
+	String googleKeyApi;
 	
 	public String getCsvColumnCode() {
 		return csvColumnCode;
@@ -36,5 +37,11 @@ public class GeoConfigBean {
 	}
 	public void setPathDirectoryMetrics(String pathDirectoryMetrics) {
 		this.pathDirectoryMetrics = pathDirectoryMetrics;
+	}
+	public String getGoogleKeyApi() {
+		return googleKeyApi;
+	}
+	public void setGoogleKeyApi(String googleKeyApi) {
+		this.googleKeyApi = googleKeyApi;
 	}
 }

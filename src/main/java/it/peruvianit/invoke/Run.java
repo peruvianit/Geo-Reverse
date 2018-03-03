@@ -34,6 +34,7 @@ public class Run {
 			
 			String pathDirectoryIn = geoConfig.getPathDirectoryIn();
 			String pathDirectoryProcess = geoConfig.getPathDirectoryProcess();
+			String googleApiKey = geoConfig.getGoogleKeyApi();
 			
 			FileUtils.checkDirecctory(pathDirectoryIn,pathDirectoryProcess);
 			
@@ -91,6 +92,7 @@ public class Run {
 		geoConfig.setPathDirectoryIn(geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_IN));
 		geoConfig.setPathDirectoryProcess(geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_PROCESS));
 		geoConfig.setPathDirectoryMetrics(geoPropertiesUtil.getProperty(GEO_PATH_DIRECTORY_METRICS));
+		geoConfig.setGoogleKeyApi(geoPropertiesUtil.getProperty(GEO_GOOGLE_KEY_API));
 		
 		return geoConfig;
 	}

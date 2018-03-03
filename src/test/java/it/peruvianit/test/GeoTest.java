@@ -17,7 +17,7 @@ public class GeoTest {
 		
 		String address = "via tritone anzio";
 		
-        coords = OpenStreetMapUtils.getInstance().getCoordinates(address);
+        coords = OpenStreetMapUtils.getInstance().getCoordinates(address, "AIzaSyBgHz3EY5gONk6SB2qtxGlumRD_Bo5wIvk");
         
         if (coords == null){
         	fail("Not yet implemented");

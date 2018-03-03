@@ -84,7 +84,7 @@ public class OpenStreetMapUtils{
 	 * @return Map<String, Double> una mappa per la LAT e LON
 	 * @throws GeoException 
 	 */	
-    public Map<String, Double> getCoordinates(String address) throws GeoException {
+    public Map<String, Double> getCoordinates(String address, String googleKeyApi) throws GeoException {
         Map<String, Double> res;
         StringBuffer query;
         String[] split = address.split(" ");
@@ -105,7 +105,7 @@ public class OpenStreetMapUtils{
                 query.append("+");
             }
         }
-        query.append("&key=AIzaSyAMl_X_byOuhQ4P6mKsrNSjeR3Xd0YT7j8"); // CHIAVE DA GOOGLE ACCOUNT
+        query.append("&key=" + googleKeyApi); // CHIAVE DA GOOGLE ACCOUNT
 
         try {
             queryResult = getRequest(query.toString());

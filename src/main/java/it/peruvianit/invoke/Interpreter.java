@@ -43,6 +43,8 @@ public class Interpreter implements Runnable {
 	private final String pathFileName;
 	private final String pathDirectoryProcess;
 	private final String pathDirectoryMetrics;
+	private final String googleKeyApi;
+		
 	private final LoadInfo loadInfo;
 	
     public Interpreter(String pathFileName, GeoConfigBean geoConfig, LoadInfo loadInfo) {
@@ -52,6 +54,7 @@ public class Interpreter implements Runnable {
 		this.csvColumnAddress = Integer.parseInt(geoConfig.getCsvColumnAddress());
 		this.pathDirectoryProcess = geoConfig.getPathDirectoryProcess();
 		this.pathDirectoryMetrics = geoConfig.getPathDirectoryMetrics();
+		this.googleKeyApi = geoConfig.getGoogleKeyApi();
 		this.loadInfo = loadInfo;
 	}
 
@@ -100,7 +103,7 @@ public class Interpreter implements Runnable {
 	        		
 	        		if(!MapCodeAddress.getInstance().findCodeAddress(idAddress)){
 		                try {
-							coords = OpenStreetMapUtils.getInstance().getCoordinates(address);
+							coords = OpenStreetMapUtils.getInstance().getCoordinates(address, googleKeyApi);
 						} catch (GeoException gEx) {							
 							throw gEx;
 						}
